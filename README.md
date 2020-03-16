@@ -1,3 +1,7 @@
+# Note
+
+This branch is set up for automated conversion. See [this README](https://github.com/plum-umd/checkedc-eval-vsftpd/blob/re-port/README.md) for instructions on how to use it.
+
 # About
 
 This CheckedC version of parson is a fork of the parson JSON parsing library by kgabis (<https://github.com/kgabis/parson)>). The code is converted into CheckedC to provide bounds guarantees from the compiler (see <https://github.com/Microsoft/checked-c> for more information). DO **NOT** USE THIS CODE IN PRODUCTION. It is not kept up to date with the main parson project.
@@ -12,9 +16,11 @@ To build and then run the unit tests: `make` or `make test`
 
 # Branches
 
-baseline: The original C code that the conversion starts from. Note that this is already behind the main parson project. This is the version used in Azure's IOT C SDK as of July 2018. This branch should pass all 325 unit tests.
+`baseline`: The original C code that the conversion starts from. Note that this is already behind the main parson project. This is the version used in Azure's IOT C SDK as of July 2018. This branch should pass all 325 unit tests.
 
-master: The converted CheckedC code.
+`re-port`: Updated version of the baseline that prepares the .c files for automated conversion using the Checked-C-convert tool. 
+
+`master`: The converted CheckedC code.
 
 # License
 

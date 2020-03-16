@@ -28,12 +28,12 @@
 
 #include "parson.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio_checked.h>
+#include <stdlib_checked.h>
+#include <string_checked.h>
 #include <ctype.h>
-#include <math.h>
-#include <errno.h>
+#include <math_checked.h>
+#include <errno_checked.h>
 
 /* Apparently sscanf is not implemented in some "standard" libraries, so don't use it, if you
  * don't have to. */
