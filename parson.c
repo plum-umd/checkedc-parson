@@ -2050,10 +2050,12 @@ int json_boolean(const JSON_Value *value) {
     return json_value_get_boolean(value);
 }
 
+/*
 void json_set_allocation_functions(JSON_Malloc_Function malloc_fun, JSON_Free_Function free_fun) {
     parson_malloc = malloc_fun;
     parson_free = free_fun;
 }
+*/
 
 void json_set_escape_slashes(int escape_slashes) {
     parson_escape_slashes = escape_slashes;

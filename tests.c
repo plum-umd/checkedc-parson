@@ -56,8 +56,10 @@ void persistence_example(void);
 void serialization_example(void);
 
 static int malloc_count;
+/*
 static void *counted_malloc(size_t size);
 static void counted_free(void *ptr);
+*/
 
 static char * read_file(const char * filename);
 
@@ -666,6 +668,7 @@ static char * read_file(const char * filename) {
     return file_contents;
 }
 
+/*
 static void *counted_malloc(size_t size) {
     void *res = malloc(size);
     if (res != NULL) {
@@ -680,3 +683,4 @@ static void counted_free(void *ptr) {
     }
     free(ptr);
 }
+*/
