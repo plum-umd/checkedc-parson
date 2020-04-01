@@ -20,6 +20,8 @@ To build and then run the unit tests: `make` or `make test`
 
 `re-port`: Updated version of the baseline that prepares the .c files for automated conversion using the Checked-C-convert tool. 
 
+`re-port-sane`: Sanitizes the `re-port` version of files to remove hard-to-handle features, such as `malloc` and `free` as first-class functions.
+
 `master`: The converted CheckedC code.
 
 # License

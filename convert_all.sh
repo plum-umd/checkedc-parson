@@ -7,6 +7,7 @@ BASEDIR=.
 
 CPATH=$INCLUDES $CCONV \
 -output-postfix=checked \
+-alltypes \
 -extra-arg-before=-Wall \
 -extra-arg-before=-Wextra \
 -extra-arg-before=-std=c99 \

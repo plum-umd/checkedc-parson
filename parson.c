@@ -50,8 +50,8 @@
 #define SKIP_WHITESPACES(str) while (isspace((unsigned char)(**str))) { SKIP_CHAR(str); }
 #define MAX(a, b)             ((a) > (b) ? (a) : (b))
 
-#undef malloc
-#undef free
+/* #undef malloc */
+/* #undef free */
 
 #if defined(isnan) && defined(isinf)
 #define IS_NUMBER_INVALID(x) (isnan((x)) || isinf((x)))
@@ -59,8 +59,10 @@
 #define IS_NUMBER_INVALID(x) (((x) * 0.0) != 0.0)
 #endif
 
-static JSON_Malloc_Function parson_malloc = malloc;
-static JSON_Free_Function parson_free = free;
+/* static JSON_Malloc_Function parson_malloc = malloc; */
+/* static JSON_Free_Function parson_free = free; */
+#define parson_malloc malloc
+#define parson_free free
 
 static int parson_escape_slashes = 1;
 
