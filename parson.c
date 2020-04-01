@@ -61,8 +61,6 @@
 
 /* static JSON_Malloc_Function parson_malloc = malloc; */
 /* static JSON_Free_Function parson_free = free; */
-#define parson_malloc malloc
-#define parson_free free
 
 static int parson_escape_slashes = 1;
 
@@ -151,7 +149,7 @@ static int    append_string(char *buf, const char *string);
 
 /* Various */
 static char * parson_strndup(const char *string, size_t n) {
-    char *output_string = (char*)parson_malloc(n + 1);
+    char *output_string = (char*)malloc(n + 1);
     if (!output_string) {
         return NULL;
     }
@@ -292,7 +290,7 @@ static char * read_file(const char * filename) {
     }
     size_to_read = pos;
     rewind(fp);
-    file_contents = (char*)parson_malloc(sizeof(char) * (size_to_read + 1));
+    file_contents = (char*)malloc(sizeof(char) * (size_to_read + 1));
     if (!file_contents) {
         fclose(fp);
         return NULL;
@@ -300,7 +298,7 @@ static char * read_file(const char * filename) {
     size_read = fread(file_contents, 1, size_to_read, fp);
     if (size_read == 0 || ferror(fp)) {
         fclose(fp);
-        parson_free(file_contents);
+        free(file_contents);
         return NULL;
     }
     fclose(fp);
@@ -345,7 +343,7 @@ static void remove_comments(char *string, const char *start_token, const char *e
 
 /* JSON Object */
 static JSON_Object * json_object_init(JSON_Value *wrapping_value) {
-    JSON_Object *new_obj = (JSON_Object*)parson_malloc(sizeof(JSON_Object));
+    JSON_Object *new_obj = (JSON_Object*)malloc(sizeof(JSON_Object));
     if (new_obj == NULL) {
         return NULL;
     }
@@ -398,21 +396,21 @@ static JSON_Status json_object_resize(JSON_Object *object, size_t new_capacity) 
         new_capacity == 0) {
             return JSONFailure; /* Shouldn't happen */
     }
-    temp_names = (char**)parson_malloc(new_capacity * sizeof(char*));
+    temp_names = (char**)malloc(new_capacity * sizeof(char*));
     if (temp_names == NULL) {
         return JSONFailure;
     }
-    temp_values = (JSON_Value**)parson_malloc(new_capacity * sizeof(JSON_Value*));
+    temp_values = (JSON_Value**)malloc(new_capacity * sizeof(JSON_Value*));
     if (temp_values == NULL) {
-        parson_free(temp_names);
+        free(temp_names);
         return JSONFailure;
     }
     if (object->names != NULL && object->values != NULL && object->count > 0) {
         memcpy(temp_names, object->names, object->count * sizeof(char*));
         memcpy(temp_values, object->values, object->count * sizeof(JSON_Value*));
     }
-    parson_free(object->names);
-    parson_free(object->values);
+    free(object->names);
+    free(object->values);
     object->names = temp_names;
     object->values = temp_values;
     object->capacity = new_capacity;
@@ -441,7 +439,7 @@ static JSON_Status json_object_remove_internal(JSON_Object *object, const char *
     last_item_index = json_object_get_count(object) - 1;
     for (i = 0; i < json_object_get_count(object); i++) {
         if (strcmp(object->names[i], name) == 0) {
-            parson_free(object->names[i]);
+            free(object->names[i]);
             if (free_value) {
                 json_value_free(object->values[i]);
             }
@@ -474,17 +472,17 @@ static JSON_Status json_object_dotremove_internal(JSON_Object *object, const cha
 static void json_object_free(JSON_Object *object) {
     size_t i;
     for (i = 0; i < object->count; i++) {
-        parson_free(object->names[i]);
+        free(object->names[i]);
         json_value_free(object->values[i]);
     }
-    parson_free(object->names);
-    parson_free(object->values);
-    parson_free(object);
+    free(object->names);
+    free(object->values);
+    free(object);
 }
 
 /* JSON Array */
 static JSON_Array * json_array_init(JSON_Value *wrapping_value) {
-    JSON_Array *new_array = (JSON_Array*)parson_malloc(sizeof(JSON_Array));
+    JSON_Array *new_array = (JSON_Array*)malloc(sizeof(JSON_Array));
     if (new_array == NULL) {
         return NULL;
     }
@@ -513,14 +511,14 @@ static JSON_Status json_array_resize(JSON_Array *array, size_t new_capacity) {
     if (new_capacity == 0) {
         return JSONFailure;
     }
-    new_items = (JSON_Value**)parson_malloc(new_capacity * sizeof(JSON_Value*));
+    new_items = (JSON_Value**)malloc(new_capacity * sizeof(JSON_Value*));
     if (new_items == NULL) {
         return JSONFailure;
     }
     if (array->items != NULL && array->count > 0) {
         memcpy(new_items, array->items, array->count * sizeof(JSON_Value*));
     }
-    parson_free(array->items);
+    free(array->items);
     array->items = new_items;
     array->capacity = new_capacity;
     return JSONSuccess;
@@ -531,13 +529,13 @@ static void json_array_free(JSON_Array *array) {
     for (i = 0; i < array->count; i++) {
         json_value_free(array->items[i]);
     }
-    parson_free(array->items);
-    parson_free(array);
+    free(array->items);
+    free(array);
 }
 
 /* JSON Value */
 static JSON_Value * json_value_init_string_no_copy(char *string) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
+    JSON_Value *new_value = (JSON_Value*)malloc(sizeof(JSON_Value));
     if (!new_value) {
         return NULL;
     }
@@ -622,7 +620,7 @@ static char* process_string(const char *input, size_t len) {
     size_t initial_size = (len + 1) * sizeof(char);
     size_t final_size = 0;
     char *output = NULL, *output_ptr = NULL, *resized_output = NULL;
-    output = (char*)parson_malloc(initial_size);
+    output = (char*)malloc(initial_size);
     if (output == NULL) {
         goto error;
     }
@@ -659,15 +657,15 @@ static char* process_string(const char *input, size_t len) {
     /* resize to new length */
     final_size = (size_t)(output_ptr-output) + 1;
     /* todo: don't resize if final_size == initial_size */
-    resized_output = (char*)parson_malloc(final_size);
+    resized_output = (char*)malloc(final_size);
     if (resized_output == NULL) {
         goto error;
     }
     memcpy(resized_output, output, final_size);
-    parson_free(output);
+    free(output);
     return resized_output;
 error:
-    parson_free(output);
+    free(output);
     return NULL;
 }
 
@@ -736,24 +734,24 @@ static JSON_Value * parse_object_value(const char **string, size_t nesting) {
         }
         SKIP_WHITESPACES(string);
         if (**string != ':') {
-            parson_free(new_key);
+            free(new_key);
             json_value_free(output_value);
             return NULL;
         }
         SKIP_CHAR(string);
         new_value = parse_value(string, nesting);
         if (new_value == NULL) {
-            parson_free(new_key);
+            free(new_key);
             json_value_free(output_value);
             return NULL;
         }
         if (json_object_add(output_object, new_key, new_value) == JSONFailure) {
-            parson_free(new_key);
+            free(new_key);
             json_value_free(new_value);
             json_value_free(output_value);
             return NULL;
         }
-        parson_free(new_key);
+        free(new_key);
         SKIP_WHITESPACES(string);
         if (**string != ',') {
             break;
@@ -825,7 +823,7 @@ static JSON_Value * parse_string_value(const char **string) {
     }
     value = json_value_init_string_no_copy(new_string);
     if (value == NULL) {
-        parson_free(new_string);
+        free(new_string);
         return NULL;
     }
     return value;
@@ -1106,7 +1104,7 @@ JSON_Value * json_parse_file(const char *filename) {
         return NULL;
     }
     output_value = json_parse_string(file_contents);
-    parson_free(file_contents);
+    free(file_contents);
     return output_value;
 }
 
@@ -1117,7 +1115,7 @@ JSON_Value * json_parse_file_with_comments(const char *filename) {
         return NULL;
     }
     output_value = json_parse_string_with_comments(file_contents);
-    parson_free(file_contents);
+    free(file_contents);
     return output_value;
 }
 
@@ -1142,7 +1140,7 @@ JSON_Value * json_parse_string_with_comments(const char *string) {
     remove_comments(string_mutable_copy, "//", "\n");
     string_mutable_copy_ptr = string_mutable_copy;
     result = parse_value((const char**)&string_mutable_copy_ptr, 0);
-    parson_free(string_mutable_copy);
+    free(string_mutable_copy);
     return result;
 }
 
@@ -1315,7 +1313,7 @@ void json_value_free(JSON_Value *value) {
             json_object_free(value->value.object);
             break;
         case JSONString:
-            parson_free(value->value.string);
+            free(value->value.string);
             break;
         case JSONArray:
             json_array_free(value->value.array);
@@ -1323,11 +1321,11 @@ void json_value_free(JSON_Value *value) {
         default:
             break;
     }
-    parson_free(value);
+    free(value);
 }
 
 JSON_Value * json_value_init_object(void) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
+    JSON_Value *new_value = (JSON_Value*)malloc(sizeof(JSON_Value));
     if (!new_value) {
         return NULL;
     }
@@ -1335,14 +1333,14 @@ JSON_Value * json_value_init_object(void) {
     new_value->type = JSONObject;
     new_value->value.object = json_object_init(new_value);
     if (!new_value->value.object) {
-        parson_free(new_value);
+        free(new_value);
         return NULL;
     }
     return new_value;
 }
 
 JSON_Value * json_value_init_array(void) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
+    JSON_Value *new_value = (JSON_Value*)malloc(sizeof(JSON_Value));
     if (!new_value) {
         return NULL;
     }
@@ -1350,7 +1348,7 @@ JSON_Value * json_value_init_array(void) {
     new_value->type = JSONArray;
     new_value->value.array = json_array_init(new_value);
     if (!new_value->value.array) {
-        parson_free(new_value);
+        free(new_value);
         return NULL;
     }
     return new_value;
@@ -1373,7 +1371,7 @@ JSON_Value * json_value_init_string(const char *string) {
     }
     value = json_value_init_string_no_copy(copy);
     if (value == NULL) {
-        parson_free(copy);
+        free(copy);
     }
     return value;
 }
@@ -1383,7 +1381,7 @@ JSON_Value * json_value_init_number(double number) {
     if (IS_NUMBER_INVALID(number)) {
         return NULL;
     }
-    new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
+    new_value = (JSON_Value*)malloc(sizeof(JSON_Value));
     if (new_value == NULL) {
         return NULL;
     }
@@ -1394,7 +1392,7 @@ JSON_Value * json_value_init_number(double number) {
 }
 
 JSON_Value * json_value_init_boolean(int boolean) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
+    JSON_Value *new_value = (JSON_Value*)malloc(sizeof(JSON_Value));
     if (!new_value) {
         return NULL;
     }
@@ -1405,7 +1403,7 @@ JSON_Value * json_value_init_boolean(int boolean) {
 }
 
 JSON_Value * json_value_init_null(void) {
-    JSON_Value *new_value = (JSON_Value*)parson_malloc(sizeof(JSON_Value));
+    JSON_Value *new_value = (JSON_Value*)malloc(sizeof(JSON_Value));
     if (!new_value) {
         return NULL;
     }
@@ -1481,7 +1479,7 @@ JSON_Value * json_value_deep_copy(const JSON_Value *value) {
             }
             return_value = json_value_init_string_no_copy(temp_string_copy);
             if (return_value == NULL) {
-                parson_free(temp_string_copy);
+                free(temp_string_copy);
             }
             return return_value;
         case JSONNull:
@@ -1541,7 +1539,7 @@ char * json_serialize_to_string(const JSON_Value *value) {
     if (buf_size_bytes == 0) {
         return NULL;
     }
-    buf = (char*)parson_malloc(buf_size_bytes);
+    buf = (char*)malloc(buf_size_bytes);
     if (buf == NULL) {
         return NULL;
     }
@@ -1601,7 +1599,7 @@ char * json_serialize_to_string_pretty(const JSON_Value *value) {
     if (buf_size_bytes == 0) {
         return NULL;
     }
-    buf = (char*)parson_malloc(buf_size_bytes);
+    buf = (char*)malloc(buf_size_bytes);
     if (buf == NULL) {
         return NULL;
     }
@@ -1614,7 +1612,7 @@ char * json_serialize_to_string_pretty(const JSON_Value *value) {
 }
 
 void json_free_serialized_string(char *string) {
-    parson_free(string);
+    free(string);
 }
 
 JSON_Status json_array_remove(JSON_Array *array, size_t ix) {
@@ -1895,7 +1893,7 @@ JSON_Status json_object_clear(JSON_Object *object) {
         return JSONFailure;
     }
     for (i = 0; i < json_object_get_count(object); i++) {
-        parson_free(object->names[i]);
+        free(object->names[i]);
         json_value_free(object->values[i]);
     }
     object->count = 0;
